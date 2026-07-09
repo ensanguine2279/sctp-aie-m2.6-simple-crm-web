@@ -1,0 +1,57 @@
+/* src/components/TagFilter.module.css */
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3, 12px);
+}
+
+.label {
+  font-size: var(--text-sm, 14px);
+  color: var(--text-muted, #666);
+  font-weight: var(--weight-medium, 500);
+  margin-right: var(--space-1, 4px);
+}
+
+.filterButton {
+  font-size: var(--text-sm, 14px);
+  font-family: var(--font-sans, sans-serif);
+  padding: 4px 12px;
+  border: 1px solid var(--border-default, #ccc);
+  border-radius: var(--radius-md, 6px);
+  background: #ffffff;
+  color: var(--text-body, #333);
+  cursor: pointer;
+  transition:
+    background var(--duration-fast, 0.15s) var(--ease-standard),
+    border-color var(--duration-fast, 0.15s) var(--ease-standard),
+    color var(--duration-fast, 0.15s) var(--ease-standard);
+}
+
+.filterButton:hover {
+  background: var(--surface-hover, #f5f5f5);
+  border-color: var(--border-focus, #999);
+}
+
+.activeButton {
+  background: var(--primary-100, #e0f2fe) !important;
+  border-color: var(--primary-500, #0284c7) !important;
+  color: var(--primary-700, #0369a1) !important;
+  font-weight: var(--weight-medium, 500);
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: var(--text-muted, #666);
+  font-size: var(--text-xs, 12px);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.clearButton:hover {
+  color: var(--text-body, #333);
+}

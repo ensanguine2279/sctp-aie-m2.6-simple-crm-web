@@ -1,0 +1,7 @@
+/* src/components/Spinner.module.css */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-8);
+}

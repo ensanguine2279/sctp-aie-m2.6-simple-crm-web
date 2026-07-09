@@ -1,0 +1,12 @@
+{
+  // add semicolons at the end of statements
+  "semi": true,
+  // use double quotes instead of single quotes
+  "singleQuote": false,
+  // indent with 2 spaces
+  "tabWidth": 2,
+  // add trailing commas where valid in ES5 (objects, arrays)
+  "trailingComma": "es5",
+  // wrap lines that exceed 80 characters
+  "printWidth": 80
+}
