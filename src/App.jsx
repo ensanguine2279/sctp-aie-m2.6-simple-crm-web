@@ -1,10 +1,8 @@
 // src/App.jsx
-import { useState, useEffect, useContext, useReducer } from "react";
+import { useState, useContext } from "react";
 
-import { customerReducer, initialState } from "./reducers/customerReducer";
-
-import { AuthContext } from "./contexts/AuthContextInstance";
-import { CustomerContext } from "./contexts/CustomerContextInstance";
+import { useAuth } from "./contexts/AuthContextInstance";
+import { useCustomers } from "./contexts/CustomerContextInstance";
 
 import LoginPage from "./components/LoginPage";
 import Header from "./components/Header";
@@ -25,7 +23,7 @@ const ALL_TAGS = ["VIP", "Lead", "Referral"];
 export const API_BASE = "http://localhost:3001";
 
 function App() {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const {
     customers,
     filteredCustomers,
@@ -58,7 +56,7 @@ function App() {
 
     setSelectedId,
     setSelectedTags,
-  } = useContext(CustomerContext);
+  } = useCustomers();
 
   const [form, setForm] = useState({
     firstName: "",
