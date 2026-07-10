@@ -7,13 +7,28 @@ import styles from "./Header.module.css";
 function Header() {
   const { user, logout } = useContext(AuthContext);
 
+  // Guard clause in case Header renders before authentication settles
+  if (!user) return null;
+
+  // Build the dynamic badge style string based on the user's role
+  const badgeClass = `${styles.roleBadge} ${
+    user.role === "admin" ? styles.roleBadgeAdmin : styles.roleBadgeUser
+  }`;
+
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>Simple CRM</h1>
-      <div className={styles.userArea}>
+      <div className={styles.logo}>
+        🛡️ <span className={styles.logoText}>Simple CRM</span>
+      </div>
+
+      <div className={styles.userInfo}>
         <span className={styles.userName}>{user.name}</span>
-        <button className={styles.logoutBtn} onClick={logout}>
-          Sign out
+
+        {/* Dynamic Role Badge Element */}
+        <span className={badgeClass}>{user.role}</span>
+
+        <button type="button" onClick={logout} className={styles.logoutBtn}>
+          Logout
         </button>
       </div>
     </header>
