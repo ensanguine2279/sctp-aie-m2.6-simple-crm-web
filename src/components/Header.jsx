@@ -1,11 +1,10 @@
 // src/components/Header.jsx
-import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContextInstance";
+import { useAuth } from "../contexts/AuthContextInstance";
 
 import styles from "./Header.module.css";
 
 function Header() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useAuth();
 
   // Guard clause in case Header renders before authentication settles
   if (!user) return null;

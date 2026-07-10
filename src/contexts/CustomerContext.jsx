@@ -12,18 +12,14 @@ export function CustomerProvider({ children }) {
 
   // Coupled state — managed by the reducer
   const [state, dispatch] = useReducer(customerReducer, initialState);
-  const { customers, loading, error, submitting, showForm } = state;
+  const { customers, listLoading, adding, deletingId, error, showForm } = state;
 
   // Independent UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
   const [selectedId, setSelectedId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
-
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState("asc"); // "asc" or "desc"
-
   const [selectedTags, setSelectedTags] = useState([]);
 
   // Helper function to introduction delays to test for loading states
@@ -44,7 +40,7 @@ export function CustomerProvider({ children }) {
     const signal = controller.signal;
 
     const loadCustomers = async () => {
-      dispatch({ type: "FETCH_START" });
+      dispatch({ type: "LIST_FETCH_START" });
       try {
         // Introduce delay to simulate loading state
         await sleep(2000);
@@ -56,7 +52,7 @@ export function CustomerProvider({ children }) {
 
         const data = await response.json();
 
-        dispatch({ type: "FETCH_SUCCESS", payload: data });
+        dispatch({ type: "LIST_FETCH_SUCCESS", payload: data });
       } catch (err) {
         // ✅ ENHANCED GUARD: If the signal was aborted by the cleanup function,
         // ignore the error entirely, regardless of what string message the browser throws.
@@ -91,9 +87,9 @@ export function CustomerProvider({ children }) {
 
       const created = await response.json();
 
-      dispatch({ type: "ADD_CUSTOMER", payload: created });
+      dispatch({ type: "ADD_SUCCESS", payload: created });
     } catch (err) {
-      dispatch({ type: "ADD_ERROR" });
+      dispatch({ type: "FETCH_ERROR" });
       alert(`Failed to add customer: ${err.message}`);
     }
   };
@@ -111,9 +107,10 @@ export function CustomerProvider({ children }) {
 
       const updated = await response.json();
 
-      dispatch({ type: "UPDATE_CUSTOMER", payload: updated });
+      dispatch({ type: "UPDATE_SUCCESS", payload: updated });
     } catch (err) {
-      alert(`Failed to update customer: ${err.message}`);
+      //alert(`Failed to update customer: ${err.message}`);
+      dispatch({ type: "FETCH_ERROR", payload: err.message });
     }
   };
 
@@ -121,6 +118,9 @@ export function CustomerProvider({ children }) {
     if (!window.confirm("Are you sure you want to delete this customer?"))
       return;
     try {
+      dispatch({ type: "DELETE_START", payload: customerId });
+      await sleep(2000);
+
       const response = await fetch(`${API_BASE}/customers/${customerId}`, {
         method: "DELETE",
       });
@@ -128,11 +128,12 @@ export function CustomerProvider({ children }) {
       if (!response.ok)
         throw new Error(`Failed to delete customer: ${response.status}`);
 
-      dispatch({ type: "DELETE_CUSTOMER", payload: customerId });
+      dispatch({ type: "DELETE_SUCCESS", payload: customerId });
 
       if (selectedId === customerId) setSelectedId(null);
     } catch (err) {
-      alert(`Failed to delete customer: ${err.message}`);
+      //alert(`Failed to delete customer: ${err.message}`);
+      dispatch({ type: "FETCH_ERROR", payload: err.message });
     }
   };
 
@@ -169,10 +170,11 @@ export function CustomerProvider({ children }) {
         filteredCustomers,
         sortedCustomers,
 
-        loading,
-        error,
-        submitting,
+        listLoading,
+        adding,
+        deletingId,
 
+        error,
         showForm,
 
         searchTerm,
@@ -182,7 +184,6 @@ export function CustomerProvider({ children }) {
 
         selectedId,
         selectedTags,
-        deletingId,
 
         addCustomer,
         updateCustomer,
@@ -198,7 +199,6 @@ export function CustomerProvider({ children }) {
 
         setSelectedId,
         setSelectedTags,
-        setDeletingId,
       }}
     >
       {children}

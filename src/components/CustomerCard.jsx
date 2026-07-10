@@ -1,5 +1,4 @@
 // src/components/CustomerCard.jsx (updated)
-import { useContext } from "react";
 import { useAuth } from "../contexts/AuthContextInstance";
 import { useCustomers } from "../contexts/CustomerContextInstance";
 
