@@ -1,14 +1,18 @@
 // src/components/CustomerDetail.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
-import { API_BASE } from "../App.jsx";
-import Spinner from "./Spinner.jsx";
+import { CustomerContext } from "../contexts/CustomerContextInstance.js";
 
-import styles from "./CustomerDetail.module.css";
 import CustomerView from "./CustomerView.jsx";
 import CustomerEditForm from "./CustomerEditForm.jsx";
 
-function CustomerDetail({ selectedId, onUpdate }) {
+import Spinner from "./Spinner.jsx";
+
+import { API_BASE } from "../App.jsx";
+
+import styles from "./CustomerDetail.module.css";
+
+function CustomerDetail({ selectedId }) {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -91,11 +95,7 @@ function CustomerDetail({ selectedId, onUpdate }) {
   return (
     <div className={styles.panel}>
       {isEditing ? (
-        <CustomerEditForm
-          customer={customer}
-          onUpdate={onUpdate}
-          onDone={handleDone}
-        />
+        <CustomerEditForm customer={customer} onDone={handleDone} />
       ) : (
         <CustomerView customer={customer} onEditClick={handleEditClick} />
       )}

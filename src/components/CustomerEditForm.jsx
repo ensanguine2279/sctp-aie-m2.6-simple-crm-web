@@ -1,10 +1,16 @@
 // src/components/CustomerEditForm.jsx
-import { useState } from "react";
+import { useState, useContext } from "react";
+
+import { CustomerContext } from "../contexts/CustomerContextInstance";
+
 import PropTypes from "prop-types";
+
 import styles from "./CustomerEditForm.module.css";
 
-function CustomerEditForm({ customer, onUpdate, onDone }) {
+function CustomerEditForm({ customer, onDone }) {
   const ALL_TAGS = ["VIP", "Lead", "Referral"];
+
+  const { updateCustomer } = useContext(CustomerContext);
 
   const [editForm, setEditForm] = useState({
     firstName: customer.firstName,
@@ -16,6 +22,7 @@ function CustomerEditForm({ customer, onUpdate, onDone }) {
     status: customer.status,
     tags: customer.tags || [],
   });
+
   const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => {
@@ -35,7 +42,7 @@ function CustomerEditForm({ customer, onUpdate, onDone }) {
     e.preventDefault();
     setSaving(true);
     try {
-      await onUpdate(customer.id, editForm);
+      await updateCustomer(customer.id, editForm);
       onDone(editForm);
     } catch (err) {
       alert(err.message);
