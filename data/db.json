@@ -7,7 +7,10 @@
       "email": "sarah.chen@email.com",
       "phone": "+65 9123 4567",
       "status": "active",
-      "tags": ["VIP", "Referral"],
+      "tags": [
+        "VIP",
+        "Referral"
+      ],
       "company": "Fintech Pte Ltd",
       "notes": "Referred by Marcus. Interested in the enterprise plan.",
       "createdAt": "2024-03-12"
@@ -19,7 +22,9 @@
       "email": "james.tan@email.com",
       "phone": "+65 9234 5678",
       "status": "active",
-      "tags": ["Lead"],
+      "tags": [
+        "Lead"
+      ],
       "company": "Builders Co",
       "notes": "Met at the PropTech conference. Follow up in Q3.",
       "createdAt": "2024-06-01"
@@ -43,7 +48,10 @@
       "email": "marcus.lim@email.com",
       "phone": "+65 9456 7890",
       "status": "active",
-      "tags": ["Lead", "VIP"],
+      "tags": [
+        "Lead",
+        "VIP"
+      ],
       "company": "RetailX Pte Ltd",
       "notes": "High-value account. Has requested a custom SLA.",
       "createdAt": "2023-11-05"
@@ -55,10 +63,27 @@
       "email": "weiling.goh@email.com",
       "phone": "+65 9567 8901",
       "status": "active",
-      "tags": ["Referral"],
+      "tags": [
+        "Referral"
+      ],
       "company": "HealthTech SG",
       "notes": "Referred by Sarah Chen.",
       "createdAt": "2024-08-19"
+    },
+    {
+      "firstName": "aaa",
+      "lastName": "bbb",
+      "email": "sadad@asd.mm",
+      "phone": "354353453",
+      "status": "active",
+      "tags": [
+        "VIP"
+      ],
+      "company": "",
+      "notes": "",
+      "createdAt": "2026-07-10",
+      "id": "vbNSQsEPWMA"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

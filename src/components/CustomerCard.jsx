@@ -1,6 +1,11 @@
 // src/components/CustomerCard.jsx (updated)
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContextInstance";
+import { CustomerContext } from "../contexts/CustomerContextInstance";
+
 import PropTypes from "prop-types";
 import { Mail, Phone } from "lucide-react";
+
 import styles from "./CustomerCard.module.css";
 
 function initials(firstName, lastName) {
@@ -34,12 +39,16 @@ function highlightText(text, search) {
 
 function CustomerCard({
   customer,
-  onDelete,
   onSelect,
   isSelected,
   searchTerm,
   deletingId,
 }) {
+  console.log("in customer card: ", customer);
+
+  const { deleteCustomer } = useContext(CustomerContext);
+  const { hasRole } = useContext(AuthContext);
+
   const { firstName, lastName, email, phone, status, tags } = customer;
   const isDeleting = deletingId === customer.id;
 
@@ -85,16 +94,17 @@ function CustomerCard({
           ))}
         </div>
 
-        <button
-          className={styles.deleteButton}
-          disabled={isDeleting} // Prevents double-clicks
-          onClick={(e) => {
-            e.stopPropagation(); // Avoid selecting the card background row click
-            onDelete(customer.id);
-          }}
-        >
-          {isDeleting ? "Deleting..." : "Delete"}
-        </button>
+        {hasRole("admin") && (
+          <button
+            className={styles.deleteButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteCustomer(customer.id);
+            }}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -110,11 +120,10 @@ CustomerCard.propTypes = {
     status: PropTypes.string.isRequired,
     tags: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  onDelete: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   isSelected: PropTypes.bool.isRequired,
   searchTerm: PropTypes.string,
-  deleting: PropTypes.bool,
+  deletingId: PropTypes.string.isRequired,
 };
 
 export default CustomerCard;

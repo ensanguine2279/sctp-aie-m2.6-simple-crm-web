@@ -1,0 +1,202 @@
+// src/contexts/CustomerContext.jsx
+import { useReducer, useState, useEffect } from "react";
+
+import { CustomerContext } from "./CustomerContextInstance";
+import { customerReducer, initialState } from "../reducers/customerReducer";
+
+import { API_BASE } from "../App";
+
+export function CustomerProvider({ children }) {
+  // Coupled state — managed by the reducer
+  const [state, dispatch] = useReducer(customerReducer, initialState);
+  const { customers, loading, error, submitting, showForm } = state;
+
+  // Independent UI state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const [selectedId, setSelectedId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const [sortField, setSortField] = useState("");
+  const [sortDirection, setSortDirection] = useState("asc"); // "asc" or "desc"
+
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  // Helper function to introduction delays to test for loading states
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const filterTagToggle = (tag) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    );
+  };
+
+  const toggleForm = () => dispatch({ type: "TOGGLE_FORM" });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const loadCustomers = async () => {
+      dispatch({ type: "FETCH_START" });
+      try {
+        // Introduce delay to simulate loading state
+        await sleep(2000);
+
+        // Pass the signal to the fetch request
+        const response = await fetch(`${API_BASE}/customers`, { signal });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+        const data = await response.json();
+
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
+      } catch (err) {
+        // ✅ ENHANCED GUARD: If the signal was aborted by the cleanup function,
+        // ignore the error entirely, regardless of what string message the browser throws.
+        if (signal.aborted || err.name === "AbortError") {
+          console.log("Fetch safely aborted on unmount.");
+          return;
+        }
+
+        dispatch({ type: "FETCH_ERROR", payload: err.message });
+      }
+    };
+
+    loadCustomers();
+
+    // Cleanup function runs when the component unmounts
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  const addCustomer = async (customerData) => {
+    dispatch({ type: "ADD_START" });
+    try {
+      const response = await fetch(`${API_BASE}/customers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(customerData),
+      });
+
+      if (!response.ok)
+        throw new Error(`Failed to add customer: ${response.status}`);
+
+      const created = await response.json();
+
+      dispatch({ type: "ADD_CUSTOMER", payload: created });
+    } catch (err) {
+      dispatch({ type: "ADD_ERROR" });
+      alert(`Failed to add customer: ${err.message}`);
+    }
+  };
+
+  const updateCustomer = async (customerId, updates) => {
+    try {
+      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok)
+        throw new Error(`Failed to update customer: ${response.status}`);
+
+      const updated = await response.json();
+
+      dispatch({ type: "UPDATE_CUSTOMER", payload: updated });
+    } catch (err) {
+      alert(`Failed to update customer: ${err.message}`);
+    }
+  };
+
+  const deleteCustomer = async (customerId) => {
+    if (!window.confirm("Are you sure you want to delete this customer?"))
+      return;
+    try {
+      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok)
+        throw new Error(`Failed to delete customer: ${response.status}`);
+
+      dispatch({ type: "DELETE_CUSTOMER", payload: customerId });
+
+      if (selectedId === customerId) setSelectedId(null);
+    } catch (err) {
+      alert(`Failed to delete customer: ${err.message}`);
+    }
+  };
+
+  const filteredCustomers = customers.filter((customer) => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch =
+      customer.firstName.toLowerCase().includes(searchLower) ||
+      customer.lastName.toLowerCase().includes(searchLower) ||
+      customer.email.toLowerCase().includes(searchLower);
+
+    const matchesStatus =
+      statusFilter === "all" || customer.status === statusFilter;
+
+    const matchesTags =
+      selectedTags.length === 0 ||
+      selectedTags.every((tag) => customer.tags && customer.tags.includes(tag));
+
+    return matchesSearch && matchesStatus && matchesTags;
+  });
+
+  const sortedCustomers = [...filteredCustomers].sort((a, b) => {
+    if (!sortField) return 0; // Don't sort if no field is selected
+
+    const comparison = a[sortField].localeCompare(b[sortField]);
+
+    // If direction is descending, invert the sort order
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
+
+  return (
+    <CustomerContext.Provider
+      value={{
+        customers,
+        filteredCustomers,
+        sortedCustomers,
+
+        loading,
+        error,
+        submitting,
+
+        showForm,
+
+        searchTerm,
+        statusFilter,
+        sortField,
+        sortDirection,
+
+        selectedId,
+        selectedTags,
+        deletingId,
+
+        addCustomer,
+        updateCustomer,
+        deleteCustomer,
+
+        toggleForm,
+        filterTagToggle,
+
+        setSearchTerm,
+        setStatusFilter,
+        setSortField,
+        setSortDirection,
+
+        setSelectedId,
+        setSelectedTags,
+        setDeletingId,
+      }}
+    >
+      {children}
+    </CustomerContext.Provider>
+  );
+}
