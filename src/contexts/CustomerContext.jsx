@@ -1,12 +1,15 @@
 // src/contexts/CustomerContext.jsx
-import { useReducer, useState, useEffect } from "react";
+import { useReducer, useState, useEffect, useContext } from "react";
 
+import { AuthContext } from "./AuthContextInstance";
 import { CustomerContext } from "./CustomerContextInstance";
 import { customerReducer, initialState } from "../reducers/customerReducer";
 
 import { API_BASE } from "../App";
 
 export function CustomerProvider({ children }) {
+  const { user } = useContext(AuthContext);
+
   // Coupled state — managed by the reducer
   const [state, dispatch] = useReducer(customerReducer, initialState);
   const { customers, loading, error, submitting, showForm } = state;
@@ -35,6 +38,8 @@ export function CustomerProvider({ children }) {
   const toggleForm = () => dispatch({ type: "TOGGLE_FORM" });
 
   useEffect(() => {
+    if (!user) return;
+
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -70,7 +75,7 @@ export function CustomerProvider({ children }) {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [user]);
 
   const addCustomer = async (customerData) => {
     dispatch({ type: "ADD_START" });
