@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState, useContext } from "react";
+import { useState } from "react";
 
 import { useAuth } from "./contexts/AuthContextInstance";
 import { useCustomers } from "./contexts/CustomerContextInstance";
@@ -107,9 +107,6 @@ function App() {
       tags: [],
     });
   };
-
-  // Helper function to introduction delays to test for loading states
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   return (
     <div className="simple-crm">

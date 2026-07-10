@@ -214,7 +214,6 @@ CustomerEditForm.propTypes = {
     status: PropTypes.string.isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
-  onUpdate: PropTypes.func.isRequired,
   onDone: PropTypes.func.isRequired,
 };
 

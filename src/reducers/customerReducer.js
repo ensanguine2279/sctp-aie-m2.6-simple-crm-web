@@ -2,54 +2,64 @@
 
 export const initialState = {
   customers: [],
-  loading: false,
+  listLoading: false, // For main customer list spinner
+  adding: false, // For new customer form submitting
+  deletingId: null, // For specific customer id being deleted
   error: null,
-  submitting: false,
   showForm: false,
 };
 
 export function customerReducer(state, action) {
   switch (action.type) {
-    case "FETCH_START":
-      return { ...state, loading: true, error: null };
+    case "LIST_FETCH_START":
+      return { ...state, listLoading: true, error: null };
 
-    case "FETCH_SUCCESS":
-      return { ...state, loading: false, customers: action.payload };
+    case "LIST_FETCH_SUCCESS":
+      return { ...state, listLoading: false, customers: action.payload };
 
     case "FETCH_ERROR":
-      return { ...state, loading: false, error: action.payload };
-
-    case "ADD_START":
-      return { ...state, submitting: true };
-
-    case "ADD_CUSTOMER":
       return {
         ...state,
-        submitting: false,
-        showForm: false,
+        listLoading: false,
+        adding: false,
+        deletingId: null,
+        error: action.payload,
+      };
+
+    case "ADD_START":
+      return { ...state, adding: true, error: null };
+
+    case "ADD_SUCCESS":
+      return {
+        ...state,
+        adding: false,
+        showForm: false, // Automatically hide form on success
         customers: [...state.customers, action.payload],
       };
 
-    case "ADD_ERROR":
-      // In a production app, this case would also set an addError field
-      // to display inline feedback. Here we use alert() to keep the lesson focused.
-      return { ...state, submitting: false };
+    case "DELETE_START":
+      return {
+        ...state,
+        deletingId: action.payload, // Store the id of the specific customer
+        error: null,
+      };
+
+    case "DELETE_SUCCESS":
+      return {
+        ...state,
+        deletingId: null, // Clear the deletion flag
+        customers: state.customers.filter((c) => c.id !== action.payload),
+      };
 
     case "TOGGLE_FORM":
       return { ...state, showForm: !state.showForm };
 
-    case "UPDATE_CUSTOMER":
+    case "UPDATE_SUCCESS":
       return {
         ...state,
         customers: state.customers.map((c) =>
           c.id === action.payload.id ? action.payload : c,
         ),
-      };
-
-    case "DELETE_CUSTOMER":
-      return {
-        ...state,
-        customers: state.customers.filter((c) => c.id !== action.payload),
       };
 
     default:
