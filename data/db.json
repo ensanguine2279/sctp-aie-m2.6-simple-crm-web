@@ -36,7 +36,9 @@
       "email": "nurul.huda@email.com",
       "phone": "+65 9345 6789",
       "status": "inactive",
-      "tags": [],
+      "tags": [
+        "Referral"
+      ],
       "company": "Gov Agency",
       "notes": "",
       "createdAt": "2024-01-20"
@@ -71,7 +73,7 @@
       "createdAt": "2024-08-19"
     },
     {
-      "firstName": "aaa",
+      "firstName": "aaacccc",
       "lastName": "bbb",
       "email": "sadad@asd.mm",
       "phone": "354353453",
