@@ -4,6 +4,8 @@ import { useState, useEffect, useContext, useReducer } from "react";
 import { customerReducer, initialState } from "./reducers/customerReducer";
 
 import { AuthContext } from "./contexts/AuthContextInstance";
+import { CustomerContext } from "./contexts/CustomerContextInstance";
+
 import LoginPage from "./components/LoginPage";
 import Header from "./components/Header";
 
@@ -24,110 +26,55 @@ export const API_BASE = "http://localhost:3001";
 
 function App() {
   const { user } = useContext(AuthContext);
+  const {
+    customers,
+    filteredCustomers,
+    sortedCustomers,
 
-  // Coupled state - managed by reducer
-  const [state, dispatch] = useReducer(customerReducer, initialState);
-  const { customers, loading, error, submitting, showForm } = state;
+    loading,
+    error,
+    submitting,
 
-  // Independent UI state - each changes on its own
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedId, setSelectedId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+    showForm,
 
-  const [sortField, setSortField] = useState("");
-  const [sortDirection, setSortDirection] = useState("asc"); // "asc" or "desc"
+    searchTerm,
+    statusFilter,
+    sortField,
+    sortDirection,
 
-  const [selectedTags, setSelectedTags] = useState([]);
+    selectedId,
+    selectedTags,
+    deletingId,
+
+    addCustomer,
+
+    toggleForm,
+    filterTagToggle,
+
+    setSearchTerm,
+    setStatusFilter,
+    setSortField,
+    setSortDirection,
+
+    setSelectedId,
+    setSelectedTags,
+  } = useContext(CustomerContext);
 
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
+    status: "active",
     tags: [],
   });
 
-  const handleFilterTagToggle = (tag) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
-  };
-
-  const handleAddCustomer = async (e) => {
-    e.preventDefault();
-
-    const newCustomer = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      phone: "",
-      status: form.status,
-      tags: form.tags,
-      company: "",
-      notes: "",
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-
-    dispatch({ type: "ADD_START" });
-
-    try {
-      const response = await fetch(`${API_BASE}/customers`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCustomer),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add customer: ${response.status}`);
-      }
-
-      const created = await response.json();
-
-      // ADD_CUSTOMER closes the form, clears submitting, and appends the customer in one step
-      dispatch({ type: "ADD_CUSTOMER", payload: created });
-
-      setForm({
-        firstName: "",
-        lastName: "",
-        email: "",
-        tags: [],
-        status: "active",
-      });
-    } catch (err) {
-      dispatch({ type: "ADD_ERROR" });
-      alert(`Failed to add customer: ${err.message}`);
-    }
-  };
+  if (!user) return <LoginPage />;
+  if (loading) return <Spinner />;
+  if (error) return <p className="status-message error">Error: {error}</p>;
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleDeleteCustomer = async (customerId) => {
-    if (!window.confirm("Are you sure you want to delete this customer?"))
-      return;
-
-    setDeletingId(customerId);
-
-    try {
-      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete customer: ${response.status}`);
-      }
-
-      dispatch({ type: "DELETE_CUSTOMER", payload: customerId });
-
-      if (selectedId === customerId) {
-        setSelectedId(null);
-      }
-    } catch (err) {
-      alert(`Failed to delete customer: ${err.message}`);
-    } finally {
-      setDeletingId(null);
-    }
   };
 
   const handleTagToggle = (tag) => {
@@ -139,100 +86,32 @@ function App() {
     }));
   };
 
-  const handleUpdateCustomer = async (customerId, updates) => {
-    try {
-      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update customer: ${response.status}`);
-      }
-
-      const updated = await response.json();
-
-      dispatch({ type: "UPDATE_CUSTOMER", payload: updated });
-    } catch (err) {
-      alert(`Failed to update customer: ${err.message}`);
-    }
+  const handleAddCustomer = async (e) => {
+    e.preventDefault();
+    const newCustomer = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      status: form.status,
+      tags: form.tags,
+      company: "",
+      notes: "",
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    await addCustomer(newCustomer);
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      status: "active",
+      tags: [],
+    });
   };
 
   // Helper function to introduction delays to test for loading states
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    const loadCustomers = async () => {
-      dispatch({ type: "FETCH_START" });
-      try {
-        // Introduce delay to simulate loading state
-        await sleep(2000);
-
-        // Pass the signal to the fetch request
-        const response = await fetch(`${API_BASE}/customers`, { signal });
-
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-
-        const data = await response.json();
-
-        dispatch({ type: "FETCH_SUCCESS", payload: data });
-      } catch (err) {
-        // ✅ ENHANCED GUARD: If the signal was aborted by the cleanup function,
-        // ignore the error entirely, regardless of what string message the browser throws.
-        if (signal.aborted || err.name === "AbortError") {
-          console.log("Fetch safely aborted on unmount.");
-          return;
-        }
-
-        dispatch({ type: "FETCH_ERROR", payload: err.message });
-      }
-    };
-
-    loadCustomers();
-
-    // Cleanup function runs when the component unmounts
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  const filteredCustomers = customers.filter((customer) => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch =
-      customer.firstName.toLowerCase().includes(searchLower) ||
-      customer.lastName.toLowerCase().includes(searchLower) ||
-      customer.email.toLowerCase().includes(searchLower);
-
-    const matchesStatus =
-      statusFilter === "all" || customer.status === statusFilter;
-
-    const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.every((tag) => customer.tags && customer.tags.includes(tag));
-
-    return matchesSearch && matchesStatus && matchesTags;
-  });
-
-  const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-    if (!sortField) return 0; // Don't sort if no field is selected
-
-    const comparison = a[sortField].localeCompare(b[sortField]);
-
-    // If direction is descending, invert the sort order
-    return sortDirection === "asc" ? comparison : -comparison;
-  });
-
-  if (!user) {
-    return <LoginPage />;
-  }
-
-  if (loading) return <Spinner />;
-
-  if (error) return <p className="status-message error">Error: {error}</p>;
 
   return (
     <div className="simple-crm">
@@ -242,7 +121,7 @@ function App() {
 
       <button
         type="button"
-        onClick={() => dispatch({ type: "TOGGLE_FORM" })}
+        onClick={toggleForm}
         className="submit-button"
         style={{ marginBottom: "24px", display: "block" }}
       >
@@ -289,6 +168,17 @@ function App() {
               value={form.email}
               onChange={handleChange}
               required
+            />
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="phone">Phone</label>
+            <input
+              id="phone"
+              name="phone"
+              placeholder="e.g. +65 9123 4567"
+              value={form.phone}
+              onChange={handleChange}
             />
           </div>
 
@@ -349,7 +239,7 @@ function App() {
           <TagFilter
             availableTags={ALL_TAGS}
             selectedTags={selectedTags}
-            onTagToggle={handleFilterTagToggle}
+            onTagToggle={filterTagToggle}
             onClearTags={() => setSelectedTags([])}
           />
 
@@ -400,7 +290,6 @@ function App() {
                   <CustomerCard
                     key={customer.id}
                     customer={customer}
-                    onDelete={handleDeleteCustomer}
                     onSelect={setSelectedId}
                     isSelected={selectedId === customer.id}
                     searchTerm={searchTerm}
@@ -412,10 +301,7 @@ function App() {
           </div>
         </div>
 
-        <CustomerDetail
-          selectedId={selectedId}
-          onUpdate={handleUpdateCustomer}
-        />
+        <CustomerDetail selectedId={selectedId} />
       </div>
     </div>
   );
