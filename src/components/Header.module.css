@@ -1,66 +1,53 @@
 /* src/components/Header.module.css */
+
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  background: var(--surface-card);
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: var(--space-6);
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
 }
 
-.title {
-  font-size: var(--text-lg, 1.125rem);
-  font-weight: var(--weight-semibold);
-  color: var(--text-strong);
-  margin: 0;
-}
-
-.userArea {
+.userInfo {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 12px;
 }
 
-.userName {
-  font-size: var(--text-sm);
-  color: var(--text-body);
+/* Base style layout for the pill-shaped badge */
+.roleBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px; /* Force standard pill shape */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Admin Specific Variant */
+.roleBadgeAdmin {
+  background-color: #fee2e2; /* Light red */
+  color: var(--danger); /* Global red text token */
+  border: 1px solid #fca5a5;
+}
+
+/* Standard User Variant */
+.roleBadgeUser {
+  background-color: #f1f5f9; /* Light slate grey */
+  color: var(--text-muted); /* Global muted text token */
+  border: 1px solid var(--border);
 }
 
 .logoutBtn {
-  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
   border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-standard);
+  font-size: 13px;
 }
 
 .logoutBtn:hover {
-  background: var(--surface-hover);
-  color: var(--text-strong);
-}
-
-/* Role badge — added in the Activity section */
-.roleBadge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  text-transform: capitalize;
-}
-
-.roleBadgeAdmin {
-  background: var(--primary-100);
-  color: var(--primary-700);
-}
-
-.roleBadgeUser {
-  background: var(--neutral-100);
-  color: var(--text-muted);
+  background: #f8fafc;
 }
