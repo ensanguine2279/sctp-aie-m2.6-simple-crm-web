@@ -1,7 +1,7 @@
 // src/components/CustomerEditForm.jsx
-import { useState, useContext } from "react";
+import { useState } from "react";
 
-import { CustomerContext } from "../contexts/CustomerContextInstance";
+import { useCustomers } from "../contexts/CustomerContextInstance";
 
 import PropTypes from "prop-types";
 
@@ -10,7 +10,7 @@ import styles from "./CustomerEditForm.module.css";
 function CustomerEditForm({ customer, onDone }) {
   const ALL_TAGS = ["VIP", "Lead", "Referral"];
 
-  const { updateCustomer } = useContext(CustomerContext);
+  const { updateCustomer } = useCustomers();
 
   const [editForm, setEditForm] = useState({
     firstName: customer.firstName,

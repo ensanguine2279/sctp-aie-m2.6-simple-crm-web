@@ -1,7 +1,7 @@
 // src/components/CustomerCard.jsx (updated)
 import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContextInstance";
-import { CustomerContext } from "../contexts/CustomerContextInstance";
+import { useAuth } from "../contexts/AuthContextInstance";
+import { useCustomers } from "../contexts/CustomerContextInstance";
 
 import PropTypes from "prop-types";
 import { Mail, Phone } from "lucide-react";
@@ -44,10 +44,8 @@ function CustomerCard({
   searchTerm,
   deletingId,
 }) {
-  console.log("in customer card: ", customer);
-
-  const { deleteCustomer } = useContext(CustomerContext);
-  const { hasRole } = useContext(AuthContext);
+  const { deleteCustomer } = useCustomers();
+  const { hasRole } = useAuth();
 
   const { firstName, lastName, email, phone, status, tags } = customer;
   const isDeleting = deletingId === customer.id;

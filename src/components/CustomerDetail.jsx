@@ -1,7 +1,5 @@
 // src/components/CustomerDetail.jsx
-import { useState, useEffect, useContext } from "react";
-
-import { CustomerContext } from "../contexts/CustomerContextInstance.js";
+import { useState, useEffect } from "react";
 
 import CustomerView from "./CustomerView.jsx";
 import CustomerEditForm from "./CustomerEditForm.jsx";
@@ -49,6 +47,7 @@ function CustomerDetail({ selectedId }) {
         }
 
         const data = await response.json();
+
         setCustomer(data);
       } catch (err) {
         if (err.name !== "AbortError") {
