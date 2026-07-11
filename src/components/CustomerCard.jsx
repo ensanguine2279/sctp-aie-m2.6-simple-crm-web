@@ -36,14 +36,8 @@ function highlightText(text, search) {
   );
 }
 
-function CustomerCard({
-  customer,
-  onSelect,
-  isSelected,
-  searchTerm,
-  deletingId,
-}) {
-  const { deleteCustomer } = useCustomers();
+function CustomerCard({ customer, onSelect, isSelected, searchTerm }) {
+  const { deleteCustomer, deletingId } = useCustomers();
   const { hasRole } = useAuth();
 
   const { firstName, lastName, email, phone, status, tags } = customer;
@@ -96,8 +90,9 @@ function CustomerCard({
             className={styles.deleteButton}
             onClick={(e) => {
               e.stopPropagation();
-              deleteCustomer(customer.id);
+              deleteCustomer(customer);
             }}
+            disabled={isDeleting}
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </button>

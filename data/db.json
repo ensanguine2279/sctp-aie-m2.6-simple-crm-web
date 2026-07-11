@@ -36,9 +36,7 @@
       "email": "nurul.huda@email.com",
       "phone": "+65 9345 6789",
       "status": "inactive",
-      "tags": [
-        "Referral"
-      ],
+      "tags": [],
       "company": "Gov Agency",
       "notes": "",
       "createdAt": "2024-01-20"
@@ -75,16 +73,16 @@
     {
       "firstName": "aaa",
       "lastName": "bbb",
-      "email": "aaa@asda.mj",
+      "email": "sadad@asd.mm",
       "phone": "23421244",
       "status": "active",
       "tags": [
-        "Lead"
+        "Referral"
       ],
       "company": "",
       "notes": "",
-      "createdAt": "2026-07-10",
-      "id": "xeYqau_Zgfc"
+      "createdAt": "2026-07-11",
+      "id": "O9wyCFfKdQk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

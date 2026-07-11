@@ -288,7 +288,6 @@ function App() {
                     onSelect={setSelectedId}
                     isSelected={selectedId === customer.id}
                     searchTerm={searchTerm}
-                    deletingId={deletingId}
                   />
                 ))}
               </div>
