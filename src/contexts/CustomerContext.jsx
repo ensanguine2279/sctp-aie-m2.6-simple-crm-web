@@ -114,26 +114,37 @@ export function CustomerProvider({ children }) {
     }
   };
 
-  const deleteCustomer = async (customerId) => {
+  const deleteCustomer = async (customer) => {
+    console.log("in deleteCustomer: ", customer);
+
     if (!window.confirm("Are you sure you want to delete this customer?"))
       return;
     try {
-      dispatch({ type: "DELETE_START", payload: customerId });
+      dispatch({ type: "DELETE_START", payload: customer });
+
+      // Perform an optimistic delete
+      dispatch({ type: "DELETE_SUCCESS", payload: customer.id });
+
       await sleep(2000);
 
-      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+      // Simulate network error
+      //throw new Error("Network error");
+
+      const response = await fetch(`${API_BASE}/customers/${customer.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok)
         throw new Error(`Failed to delete customer: ${response.status}`);
 
-      dispatch({ type: "DELETE_SUCCESS", payload: customerId });
+      dispatch({ type: "DELETE_SUCCESS", payload: customer.id });
 
-      if (selectedId === customerId) setSelectedId(null);
+      if (selectedId === customer.id) setSelectedId(null);
     } catch (err) {
-      //alert(`Failed to delete customer: ${err.message}`);
-      dispatch({ type: "FETCH_ERROR", payload: err.message });
+      alert(`Failed to delete customer: ${err.message}`);
+
+      // Restore customer in the event of failure
+      dispatch({ type: "RESTORE_CUSTOMER", payload: customer });
     }
   };
 

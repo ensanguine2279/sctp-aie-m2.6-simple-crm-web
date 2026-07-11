@@ -7,6 +7,7 @@ export const initialState = {
   deletingId: null, // For specific customer id being deleted
   error: null,
   showForm: false,
+  deletingCustomer: null, // For optimistic delete
 };
 
 export function customerReducer(state, action) {
@@ -40,8 +41,9 @@ export function customerReducer(state, action) {
     case "DELETE_START":
       return {
         ...state,
-        deletingId: action.payload, // Store the id of the specific customer
+        deletingId: action.payload.id, // Store the id of the specific customer
         error: null,
+        deletingCustomer: action.payload, // Store the customer in the event of a rollback
       };
 
     case "DELETE_SUCCESS":
@@ -60,6 +62,15 @@ export function customerReducer(state, action) {
         customers: state.customers.map((c) =>
           c.id === action.payload.id ? action.payload : c,
         ),
+      };
+
+    case "RESTORE_CUSTOMER":
+      return {
+        ...state,
+        error: null,
+        deletingId: null, // Clear the deletion flag
+        customers: [...state.customers, state.deletingCustomer],
+        deletingCustomer: null,
       };
 
     default:
